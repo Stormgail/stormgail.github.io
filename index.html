@@ -1,1 +1,351 @@
-"Hello World" 
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+"use strict";
+function byId(e){return document.getElementById(e);}
+function newEl(tag){return document.createElement(tag);}
+
+window.addEventListener('load', onDocLoaded, false);
+
+var grid = {};
+
+var unrevealed = 0;
+var empty = -2;
+var metal = -1;
+var fox = 1;
+var medium = 2;
+var swords = 3;
+
+var foxValue = 100;
+var mediumvalue = 15;
+var chestvalue = 20;
+var presentvalue = 10;
+var swordsvalue = 5;
+
+var nCols = 6;
+var nRows = 6;
+
+var positive = 1;
+var negative = -1
+
+var wantRetelling = false;
+
+var swordFound = false;
+var mediumFound = false;
+
+
+var values = [
+    {name:"Unrevealed",
+    value: unrevealed},
+    {name:"Empty",
+    value: empty}
+    ,
+    {name:"Metal",
+    value: metal}
+    ,
+    {name:"Fox",
+    value: fox}
+    ,
+    {name:"Chest/Present",
+    value: medium}
+    ,
+    {name:"Swords",
+    value: swords}
+]
+
+function onDocLoaded()
+{
+    buildGrid()
+}
+
+function withinBounds(x,y)
+{
+if(x>=0 && y>=0 && x<=(nCols-1) && y<=(nRows-1)){
+    return true
+}
+return false;
+}
+
+function canPlace(type, tile){
+    if (tile.type == type || tile.type == unrevealed){
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+function tryFitTiles(xStart,yStart){
+    if(!mediumFound){
+        tryFitMedium(xStart,yStart);
+    }
+    if(!swordFound){
+    tryFitLongSide(xStart,yStart);
+    tryFitLongTall(xStart,yStart);
+    }
+}
+
+function tryFitMedium(xStart,yStart)
+{
+    if(canFit(xStart,yStart,1,1,medium))
+    {
+        addValueToTiles(xStart,yStart,1,1,4)
+    }
+}
+
+function tryFitLongSide(xStart,yStart)
+{
+    if(canFit(xStart,yStart,2,1,medium))
+    {
+        addValueToTiles(xStart,yStart,2,1,6)
+    }
+}
+
+
+function tryFitLongTall(xStart,yStart)
+{
+    if(canFit(xStart,yStart,1,2,medium))
+    {
+        addValueToTiles(xStart,yStart,1,2,6)
+    }
+}
+
+
+
+
+
+
+function canFit(xStart, yStart, xSize,ySize, type)
+{
+    var canPlaceTile = true;
+
+    if(!withinBounds((xStart+xSize),(yStart+ySize))){
+        return false;
+    }
+
+    var x, y;
+    for (y=0; y<=ySize; y++)
+    {
+
+        for (x=0; x<=xSize; x++)
+        {
+
+            var currentXPos = xStart + x;
+            var currentYPos =  yStart + y;
+            
+            var tile = grid[formatGridPosition(currentXPos,currentYPos)]
+            
+            canPlaceTile = canPlace(type,tile);
+
+            if(!canPlaceTile){
+                return false;
+            }
+        }
+
+    }  
+
+    return canPlaceTile;
+}
+
+function addValueToTiles(xStart, yStart, xSize,ySize,valueToAdd)
+{
+
+    var x, y;
+    for (y=0; y<=ySize; y++)
+    {
+
+        for (x=0; x<=xSize; x++)
+        {
+
+            var currentXPos = xStart + x;
+            var currentYPos =  yStart + y;
+            
+            var tile = grid[formatGridPosition(currentXPos,currentYPos)]
+            
+           tile.value+= valueToAdd;
+        }
+
+    }  
+
+}
+
+function recalculateGrid(){
+    var x, y;
+    for (y=0; y<nRows; y++)
+    {
+        for (x=0; x<nCols; x++)
+        {
+            tryFitTiles(x,y)
+        }
+
+    }
+
+    buildGridValues();
+}
+
+function formatGridPosition(xpos,ypos){
+
+return xpos + "/" + ypos;
+}
+
+
+
+
+
+function formatGridPosition(xpos,ypos){
+
+    return xpos + "/" + ypos;
+}
+
+
+
+function onGridValueChanged(evt)
+{
+    grid[this.name].type = this.value;
+}
+
+function buildGridValues()
+{
+    byId('tblDebug').innerHTML = '';
+
+
+    var tbl, curRow, curCell;
+    tbl = newEl('table');
+    var x, y;
+    for (y=0; y<nRows; y++)
+    {
+        curRow = newEl('tr');
+        tbl.appendChild(curRow);
+
+        for (x=0; x<nCols; x++)
+        {
+            curCell = newEl('INPUT');       
+            curCell.setAttribute("type", "text");
+            curCell.value =  grid[formatGridPosition(x,y)].value
+            curRow.appendChild(curCell);
+        }
+    }
+    byId('tblDebug').appendChild(tbl);
+}
+
+function buildGridValues()
+{
+    byId('tblDebug').innerHTML = '';
+
+
+    var tbl, curRow, curCell;
+    tbl = newEl('table');
+    var x, y;
+    for (y=0; y<nRows; y++)
+    {
+        curRow = newEl('tr');
+        tbl.appendChild(curRow);
+
+        for (x=0; x<nCols; x++)
+        {
+            curCell = newEl('INPUT');       
+            curCell.setAttribute("type", "text");
+            curCell.value =  grid[formatGridPosition(x,y)].value
+            curRow.appendChild(curCell);
+        }
+    }
+    byId('tblDebug').appendChild(tbl);
+}
+
+
+function checkForComplete()
+{
+    var swordCount = 0;
+    var mediumCount = 0;
+    var x, y;
+    for (y=0; y<nRows; y++)
+    {
+
+
+       
+
+        for (x=0; x<nCols; x++)
+        {
+            var tile = grid[formatGridPosition(x,y)];
+            if(tile.type == sword){
+                swordCount++
+            }else if(tile.type == medum){
+                mediumCount++
+            }
+        }
+    }
+
+    if(mediumCount==4){
+        mediumFound = true;
+    }
+
+    if(swordCount==6){
+        swordFound = true;
+    }
+
+}
+
+
+
+
+
+
+
+
+function buildGrid()
+{
+    byId('tblTgt').innerHTML = '';
+
+
+    var tbl, curRow, curCell;
+    tbl = newEl('table');
+    var x, y;
+    for (y=0; y<nRows; y++)
+    {
+        curRow = newEl('tr');
+        tbl.appendChild(curRow);
+
+        for (x=0; x<nCols; x++)
+        {
+
+
+            grid[formatGridPosition(x,y)] = {
+                x: x,
+                x: y,
+                type: unrevealed,
+                value: 0
+            }
+
+            curCell = newEl('select');
+            curCell.name = formatGridPosition(x,y)
+            curCell.id = "select" + x + "/" + y
+            curCell.addEventListener('change', onGridValueChanged, false);
+
+            for (const val of values){
+                var option = document.createElement("option");
+                option.value = val.value;
+                option.text = val.name;
+                curCell.appendChild(option);
+            }
+
+            //curCell.innerText = "[" + x + "," + y + "]";
+            curRow.appendChild(curCell);
+        }
+    }
+    byId('tblTgt').appendChild(tbl);
+}
+
+</script>
+<style>
+
+</style>
+</head>
+<body>
+    <hr>
+    <div id='tblTgt'></div>
+
+    <div id='tblDebug'></div>
+</body>
+</html>
