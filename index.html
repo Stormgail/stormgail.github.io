@@ -1,6 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+<style>
+
+select {
+                width: 50px;
+                height:50px;
+            }
+
+            input {
+                width: 50px;
+                height:50px;
+            }
+
+
+.bestMatch {
+     background: green;
+}
+        
+</style>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 <script>
 "use strict";
 function byId(e){return document.getElementById(e);}
@@ -17,17 +41,8 @@ var fox = 1;
 var medium = 2;
 var swords = 3;
 
-var foxValue = 100;
-var mediumvalue = 15;
-var chestvalue = 20;
-var presentvalue = 10;
-var swordsvalue = 5;
-
 var nCols = 6;
 var nRows = 6;
-
-var positive = 1;
-var negative = -1
 
 var wantRetelling = false;
 
@@ -58,6 +73,10 @@ var values = [
 
 function onDocLoaded()
 {
+init()
+}
+
+function init(){
     buildGrid();
     recalculateGrid();
 }
@@ -222,6 +241,41 @@ function recalculateGrid(){
     }
 
     buildGridValuesSection();
+
+    hightlightHighestRows()
+    }
+}
+
+
+
+function hightlightHighestRows(){
+    
+    var x, y, max;
+    max = 0;
+    for (y=0; y<nRows; y++)
+    {
+        for (x=0; x<nCols; x++)
+        {
+            var tile = grid[formatGridPosition(x,y)];
+            if(tile.value>max){
+                max = tile.value;
+            }
+        }
+
+    }
+
+
+    for (y=0; y<nRows; y++)
+    {
+        for (x=0; x<nCols; x++)
+        {
+            var tile = grid[formatGridPosition(x,y)];
+            if(tile.value==max){
+                byId("select"+formatGridPosition(x,y)).classList.add("bestMatch")
+                byId("display"+formatGridPosition(x,y)).classList.add("bestMatch")
+            }
+        }
+
     }
 }
 
@@ -259,7 +313,8 @@ function buildGridValuesSection()
 
         for (x=0; x<nCols; x++)
         {
-            curCell = newEl('INPUT');       
+            curCell = newEl('INPUT');
+            curCell.setAttribute("id","display"+formatGridPosition(x,y))       
             curCell.setAttribute("type", "text");
             curCell.value =  grid[formatGridPosition(x,y)].value
             curRow.appendChild(curCell);
@@ -305,6 +360,8 @@ function validateGrid()
 
                 mediumCount++
             }
+
+            byId("select"+formatGridPosition(x,y)).className = "";
 
             tile.value = 0;
         }
@@ -374,7 +431,7 @@ function buildGrid()
 {
     byId('tblTgt').innerHTML = '';
 
-
+    grid = {};
     var tbl, curRow, curCell;
     tbl = newEl('table');
     var x, y;
@@ -395,7 +452,7 @@ function buildGrid()
             }
             curCell = newEl('select');
             curCell.name = formatGridPosition(x,y)
-            curCell.id = "select" + x + "/" + y
+            curCell.id = "select" + formatGridPosition(x,y)
             curCell.addEventListener('change', onGridValueChanged, false);
 
             for (const val of values){
@@ -422,7 +479,9 @@ function buildGrid()
 
     <div><table id='MessageSection'></table></div>
     <hr>
+    
     <div id='tblTgt'></div>
+    <button onclick="init()">Reset</button>
     <hr>
     <div id='tblDebug'></div>
 
@@ -431,7 +490,7 @@ function buildGrid()
         <h1>How to Use</h1>
         <ul>
             <li>Fill in all the metal tiles you can see in the grid above</li>
-            <li>The tiles with the highest value (green) will Give you the most information</li>
+            <li>The tiles with the highest value (Green) will Give you the most information</li>
             <li>When you find a piece of a larger image in game, fill in the grid above with the whole image</li>
             <li>If you can use your Retelling, when you find the swords Icon, reveal it</li>
             <li>If you cannot use your retelling or have fully revealed the swords, then search for the Medium tile</li>
