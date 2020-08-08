@@ -34,6 +34,8 @@ var wantRetelling = false;
 var swordFound = false;
 var mediumFound = false;
 
+var hasErrors = true;
+
 
 var values = [
     {name:"Unrevealed",
@@ -56,7 +58,8 @@ var values = [
 
 function onDocLoaded()
 {
-    buildGrid()
+    buildGrid();
+    recalculateGrid();
 }
 
 function withinBounds(x,y)
@@ -67,8 +70,8 @@ if(x>=0 && y>=0 && x<=(nCols-1) && y<=(nRows-1)){
 return false;
 }
 
-function canPlace(type, tile){
-    if (tile.type == type || tile.type == unrevealed){
+function canPlace(type, tile, onlyExactMatch){
+    if (tile.type == type || (tile.type == unrevealed && !onlyExactMatch)){
         return true;
     }
     else
@@ -78,46 +81,77 @@ function canPlace(type, tile){
 }
 
 function tryFitTiles(xStart,yStart){
-    if(!mediumFound){
-        tryFitMedium(xStart,yStart);
+    if(!mediumFound && tryFitMedium(xStart,yStart)){
+        scoreMedium(xStart,yStart)
     }
     if(!swordFound){
-    tryFitLongSide(xStart,yStart);
-    tryFitLongTall(xStart,yStart);
+        if(tryFitLongSide(xStart,yStart)){
+            scoreLongSide(xStart,yStart);
+        }
+        if(tryFitLongTall(xStart,yStart)){
+            scoreLongTall(xStart,yStart);
+        }
+
     }
 }
+
 
 function tryFitMedium(xStart,yStart)
 {
-    if(canFit(xStart,yStart,1,1,medium))
-    {
-        addValueToTiles(xStart,yStart,1,1,4)
-    }
+    return tryFitMedium(xStart,yStart,false)
 }
+
+
+function tryFitMedium(xStart,yStart,onlyExactMatch)
+{
+    return canFit(xStart,yStart,1,1,medium,onlyExactMatch)
+}
+
+function scoreMedium(xStart,yStart){
+    addValueToTiles(xStart,yStart,1,1,4)
+}
+
 
 function tryFitLongSide(xStart,yStart)
 {
-    if(canFit(xStart,yStart,2,1,medium))
-    {
-        addValueToTiles(xStart,yStart,2,1,6)
-    }
+    return tryFitLongSide(xStart,yStart,false)
 }
 
+
+function tryFitLongSide(xStart,yStart,onlyExactMatch)
+{
+    return canFit(xStart,yStart,2,1,swords,onlyExactMatch);
+}
+
+function scoreLongSide(xStart,yStart){
+    
+    addValueToTiles(xStart,yStart,2,1,6);
+}
 
 function tryFitLongTall(xStart,yStart)
 {
-    if(canFit(xStart,yStart,1,2,medium))
-    {
-        addValueToTiles(xStart,yStart,1,2,6)
-    }
+    return tryFitLongTall(xStart,yStart,false);
 }
 
 
+function tryFitLongTall(xStart,yStart,onlyExactMatch)
+{
+    return canFit(xStart,yStart,1,2,swords,onlyExactMatch);
+}
 
+function scoreLongTall(xStart,yStart){
+    addValueToTiles(xStart,yStart,1,2,6);
+}
 
 
 
 function canFit(xStart, yStart, xSize,ySize, type)
+{
+   return canFit(xStart, yStart, xSize,ySize, type, false)
+}
+
+
+function canFit(xStart, yStart, xSize,ySize, type, onlyExactMatch)
 {
     var canPlaceTile = true;
 
@@ -137,7 +171,7 @@ function canFit(xStart, yStart, xSize,ySize, type)
             
             var tile = grid[formatGridPosition(currentXPos,currentYPos)]
             
-            canPlaceTile = canPlace(type,tile);
+            canPlaceTile = canPlace(type,tile,onlyExactMatch);
 
             if(!canPlaceTile){
                 return false;
@@ -172,6 +206,11 @@ function addValueToTiles(xStart, yStart, xSize,ySize,valueToAdd)
 }
 
 function recalculateGrid(){
+    clearGridValuesSection()
+    validateGrid();
+
+    if(!hasErrors){
+
     var x, y;
     for (y=0; y<nRows; y++)
     {
@@ -182,7 +221,8 @@ function recalculateGrid(){
 
     }
 
-    buildGridValues();
+    buildGridValuesSection();
+    }
 }
 
 function formatGridPosition(xpos,ypos){
@@ -191,24 +231,22 @@ return xpos + "/" + ypos;
 }
 
 
-
-
-
-function formatGridPosition(xpos,ypos){
-
-    return xpos + "/" + ypos;
-}
-
-
-
 function onGridValueChanged(evt)
 {
     grid[this.name].type = this.value;
+
+    recalculateGrid();
 }
 
-function buildGridValues()
+
+function clearGridValuesSection()
 {
     byId('tblDebug').innerHTML = '';
+}
+
+function buildGridValuesSection()
+{
+    clearGridValuesSection();
 
 
     var tbl, curRow, curCell;
@@ -230,68 +268,106 @@ function buildGridValues()
     byId('tblDebug').appendChild(tbl);
 }
 
-function buildGridValues()
+
+function validateGrid()
 {
-    byId('tblDebug').innerHTML = '';
+    clearErrors();
+    //Reset values
+    hasErrors = false;
+    swordFound = false;
+    mediumFound = false;
 
 
-    var tbl, curRow, curCell;
-    tbl = newEl('table');
-    var x, y;
-    for (y=0; y<nRows; y++)
-    {
-        curRow = newEl('tr');
-        tbl.appendChild(curRow);
-
-        for (x=0; x<nCols; x++)
-        {
-            curCell = newEl('INPUT');       
-            curCell.setAttribute("type", "text");
-            curCell.value =  grid[formatGridPosition(x,y)].value
-            curRow.appendChild(curCell);
-        }
-    }
-    byId('tblDebug').appendChild(tbl);
-}
-
-
-function checkForComplete()
-{
     var swordCount = 0;
     var mediumCount = 0;
+
+    var firstSword;
+
+    var firstMedium;
+
     var x, y;
     for (y=0; y<nRows; y++)
-    {
-
-
-       
+    {     
 
         for (x=0; x<nCols; x++)
         {
             var tile = grid[formatGridPosition(x,y)];
-            if(tile.type == sword){
+            if(tile.type == swords){
+                if(!firstSword){
+                    firstSword = tile;
+                }
                 swordCount++
-            }else if(tile.type == medum){
+            }else if(tile.type == medium){
+                
+                if(!firstMedium){
+                    firstMedium = tile;
+                }
+
                 mediumCount++
             }
+
+            tile.value = 0;
         }
     }
 
-    if(mediumCount==4){
-        mediumFound = true;
+    if(mediumCount<4 && mediumCount > 0){
+        addError("If you have Found one medium tile, please fill in the rest.")
+    }
+
+    if(swordCount<6  && swordCount > 0){
+
+        addError("If you have Found one swords tile, please fill in the rest.")
+    }
+
+    if(mediumCount==4)
+    {
+        if(tryFitMedium(firstMedium.x,firstMedium.y,true)){
+            mediumFound = true;
+        }
+        else
+        {     
+        addError("Please double check your chest/present position")
+        }
+        
     }
 
     if(swordCount==6){
-        swordFound = true;
+
+        if(tryFitLongTall(firstSword.x,firstSword.y,true) || tryFitLongSide(firstSword.x,firstSword.y,true)){
+            swordFound = true;
+        }
+        else{     
+        addError("Please double check your swords position")
+        }
+    }
+
+    if(mediumCount>4){
+        addError("You have too many Medium tiles")
+    }
+
+    if(swordCount>6){        
+        addError("You have too many Sword tiles")
     }
 
 }
 
+function clearErrors()
+{
+    byId('MessageSection').innerHTML = '';
+}
 
+function addError(errorText)
+{
+    hasErrors = true;
+    var error, curRow;
 
+    curRow = newEl('tr');
+    error = newEl('text');
+    error.innerHTML =  '<p>' + errorText + '</p>'
 
-
-
+    curRow.appendChild(error);
+    byId('MessageSection').appendChild(curRow);
+}
 
 
 function buildGrid()
@@ -313,11 +389,10 @@ function buildGrid()
 
             grid[formatGridPosition(x,y)] = {
                 x: x,
-                x: y,
+                y: y,
                 type: unrevealed,
                 value: 0
             }
-
             curCell = newEl('select');
             curCell.name = formatGridPosition(x,y)
             curCell.id = "select" + x + "/" + y
@@ -343,9 +418,26 @@ function buildGrid()
 </style>
 </head>
 <body>
+
+
+    <div><table id='MessageSection'></table></div>
     <hr>
     <div id='tblTgt'></div>
-
+    <hr>
     <div id='tblDebug'></div>
+
+    <div id='instructions'>
+
+        <h1>How to Use</h1>
+        <ul>
+            <li>Fill in all the metal tiles you can see in the grid above</li>
+            <li>The tiles with the highest value (green) will Give you the most information</li>
+            <li>When you find a piece of a larger image in game, fill in the grid above with the whole image</li>
+            <li>If you can use your Retelling, when you find the swords Icon, reveal it</li>
+            <li>If you cannot use your retelling or have fully revealed the swords, then search for the Medium tile</li>
+            <li>If you can complete the medium tile with remaining reveals, do so</li>
+            <li>If you cannot finish a larger tile, search for the chance of the Bonus tile (avoid spaces you know are parts of bigger tiles)</li>
+        </ul>>
+    </div>
 </body>
 </html>
