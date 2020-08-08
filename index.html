@@ -14,6 +14,11 @@ select {
                 height:50px;
             }
 
+.container {
+  display: flex;
+  justify-content: center;
+}
+
 
 .bestMatch {
      background: green;
@@ -477,17 +482,21 @@ function buildGrid()
 <body>
 
 
-    <div><table id='MessageSection'></table></div>
+    <div class="container" ><table id='MessageSection'></table></div>
     <hr>
     
-    <div id='tblTgt'></div>
+    <div id='tblTgt' class="container"></div>
+    <div class="container" >
     <button onclick="init()">Reset</button>
+</div>
     <hr>
-    <div id='tblDebug'></div>
+    <div id='tblDebug' class="container" ></div>
 
-    <div id='instructions'>
-
+    <div id='instructions' >
+        <div class="container">
         <h1>How to Use</h1>
+    </div>#
+    <div class="container">
         <ul>
             <li>Fill in all the metal tiles you can see in the grid above</li>
             <li>The tiles with the highest value (Green) will Give you the most information</li>
@@ -496,7 +505,9 @@ function buildGrid()
             <li>If you cannot use your retelling or have fully revealed the swords, then search for the Medium tile</li>
             <li>If you can complete the medium tile with remaining reveals, do so</li>
             <li>If you cannot finish a larger tile, search for the chance of the Bonus tile (avoid spaces you know are parts of bigger tiles)</li>
-        </ul>>
+        </ul>
     </div>
+
+</div>
 </body>
 </html>
