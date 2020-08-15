@@ -4,15 +4,50 @@
 
 <style>
 
-select {
-                width: 50px;
-                height:50px;
-            }
+td{
+    text-align: center; 
+}
+select{
+    width: 50px;
+    height:50px;
+}
 
-            input {
-                width: 50px;
-                height:50px;
-            }
+p{
+    vertical-align: middle;
+}
+
+.container.hiddenSection{
+    display:none;
+}
+.square
+{
+    width: 50px;
+    height:50px;
+    display: inline-block;
+    margin: 1px;
+}
+
+.selectorSection{
+    margin-right: 10px;
+    align-self:center;
+    display:flex;
+    flex-direction:column;
+}
+
+.selectorRow{
+    margin:2px;
+}
+
+.addBorder{
+    border: 1px solid black;
+    border-collapse:collapse;
+}
+
+.selected.addBorder{
+    border: 3px solid green;
+    border-collapse:collapse;
+}
+
 
 .container {
   display: flex;
@@ -27,9 +62,6 @@ select {
 </style>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 <script>
 "use strict";
 function byId(e){return document.getElementById(e);}
@@ -56,24 +88,32 @@ var mediumFound = false;
 
 var hasErrors = true;
 
+var selected = null;
+
 
 var values = [
     {name:"Unrevealed",
-    value: unrevealed},
+    value: unrevealed,
+    color : "white"},
     {name:"Empty",
-    value: empty}
+    value: empty,
+    color : "red"}
     ,
     {name:"Metal",
-    value: metal}
+    value: metal,
+    color : "darkgrey"}
     ,
     {name:"Fox",
-    value: fox}
+    value: fox,
+    color : "gold"}
     ,
     {name:"Chest/Present",
-    value: medium}
+    value: medium,
+    color : "brown"}
     ,
     {name:"Swords",
-    value: swords}
+    value: swords,
+    color : "lightblue"}
 ]
 
 function onDocLoaded()
@@ -84,6 +124,7 @@ init()
 function init(){
     buildGrid();
     recalculateGrid();
+    buildSelector();
 }
 
 function withinBounds(x,y)
@@ -308,7 +349,7 @@ function buildGridValuesSection()
     clearGridValuesSection();
 
 
-    var tbl, curRow, curCell;
+    var tbl, curRow, curCell, container;
     tbl = newEl('table');
     var x, y;
     for (y=0; y<nRows; y++)
@@ -318,11 +359,18 @@ function buildGridValuesSection()
 
         for (x=0; x<nCols; x++)
         {
-            curCell = newEl('INPUT');
-            curCell.setAttribute("id","display"+formatGridPosition(x,y))       
+            container = newEl("td");
+            container.classList.add("square");
+            container.classList.add("addBorder")
+            container.setAttribute("id","display"+formatGridPosition(x,y))       
+          
+            curCell = newEl('p');
+            
             curCell.setAttribute("type", "text");
-            curCell.value =  grid[formatGridPosition(x,y)].value
-            curRow.appendChild(curCell);
+            curCell.value =  grid[formatGridPosition(x,y)].value;
+            curCell.innerHTML = grid[formatGridPosition(x,y)].value;
+            container.appendChild(curCell)
+            curRow.appendChild(container);
         }
     }
     byId('tblDebug').appendChild(tbl);
@@ -431,13 +479,54 @@ function addError(errorText)
     byId('MessageSection').appendChild(curRow);
 }
 
+function buildSelector()
+{
+    byId('iconSelector').innerHTML = '';
+
+    var container;
+   
+   
+    for (const val of values){
+                
+
+
+                var container = newEl('td');
+                container.classList.add("selectorRow")
+                container.classList.add("selector")
+                container.style.backgroundColor = val.color;
+                container.classList.add('addBorder');
+
+                var text = newEl('p'); 
+                text.name = val.name + "selector"
+                text.id =  val.name + "selector"
+                text.addEventListener('click', selectorClick, false);
+                text.value = val.value;
+                text.text = val.name;
+                text.innerHTML= val.name;
+
+                if(val.value == selected){
+                container.classList.add('selected');
+                }
+
+                container.appendChild(text);
+            
+                byId('iconSelector').appendChild(container);
+            }
+           
+}
+
+function selectorClick(evt){
+
+    selected = this.value;
+    buildSelector();
+}
 
 function buildGrid()
 {
     byId('tblTgt').innerHTML = '';
 
     grid = {};
-    var tbl, curRow, curCell;
+    var tbl, curRow, curCell, container;
     tbl = newEl('table');
     var x, y;
     for (y=0; y<nRows; y++)
@@ -447,8 +536,8 @@ function buildGrid()
 
         for (x=0; x<nCols; x++)
         {
-
-
+            container = newEl('td');
+            container.classList.add("selector")
             grid[formatGridPosition(x,y)] = {
                 x: x,
                 y: y,
@@ -459,16 +548,16 @@ function buildGrid()
             curCell.name = formatGridPosition(x,y)
             curCell.id = "select" + formatGridPosition(x,y)
             curCell.addEventListener('change', onGridValueChanged, false);
-
+            
             for (const val of values){
                 var option = document.createElement("option");
                 option.value = val.value;
                 option.text = val.name;
                 curCell.appendChild(option);
             }
-
+            container.appendChild(curCell)
             //curCell.innerText = "[" + x + "," + y + "]";
-            curRow.appendChild(curCell);
+            curRow.appendChild(container);
         }
     }
     byId('tblTgt').appendChild(tbl);
@@ -482,16 +571,18 @@ function buildGrid()
 <body>
 
     <div class="container"><h2>Faux Hollow Solver</h2></div>
-    <div class="container" ><table id='MessageSection'></table></div>
     <hr>
-    
-    <div id='tblTgt' class="container"></div>
+    <div class="container">
+    <div id='iconSelector' class="selectorSection"></div>
+    <div id='tblTgt'></div>
+    </div>
     <div class="container" >
     <button onclick="init()">Reset</button>
 </div>
     <hr>
-    <div id='tblDebug' class="container" ></div>
-
+    <div class="container" ><table id='MessageSection'></table></div>
+    <div id='tblDebug' class="hiddenSection container" ></div>
+    <hr>
     <div id='instructions' >
         <div class="container">
         <h2>How to Use</h2>
