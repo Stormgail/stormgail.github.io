@@ -44,6 +44,13 @@ p{
     border-collapse:collapse;
 }
 
+.message{
+    border: 3px solid blueviolet;
+    border-collapse:collapse;
+    background-color: beige;
+    text-emphasis: form;
+}
+
 .selected.addBorder{
     border: 3px solid gold;
     border-collapse:collapse;
@@ -437,7 +444,7 @@ function addError(errorText)
     curRow = newEl('tr');
     error = newEl('text');
     error.innerHTML =  '<p>' + errorText + '</p>'
-
+    curRow.classList.add("message")
     curRow.appendChild(error);
     byId('MessageSection').appendChild(curRow);
 }
@@ -576,6 +583,7 @@ function buildGrid()
 <body>
 
     <div class="container"><h2>Faux Hollow Solver</h2></div>
+    <div class="container" ><table id='MessageSection'></table></div>
     <hr>
     <div class="container">
     <div id='iconSelector' class="selectorSection"></div>
@@ -585,7 +593,7 @@ function buildGrid()
     <button onclick="init()">Reset</button>
 </div>
     <hr>
-    <div class="container" ><table id='MessageSection'></table></div>
+
     <div id='tblDebug' class="hiddenSection container" ></div>
     <hr>
     <div id='instructions' >
