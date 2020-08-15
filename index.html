@@ -39,8 +39,12 @@ p{
     margin:2px;
 }
 
-.addBorder{
-    border: 1px solid black;
+.btn{
+    display:flex
+}
+
+.btn.addBorder{
+    border: 2px solid gray;
     border-collapse:collapse;
 }
 
@@ -52,7 +56,7 @@ p{
 }
 
 .selected.addBorder{
-    border: 3px solid gold;
+    border: 2px solid green;
     border-collapse:collapse;
 }
 
@@ -460,27 +464,25 @@ function buildSelector()
                 
 
 
-                var container = newEl('td');
-                container.classList.add("selectorRow")
-                container.classList.add("selector")
-                container.style.backgroundColor = val.color;
-                container.classList.add('addBorder');
 
-                var text = newEl('p'); 
-                text.name = val.name + "selector"
-                text.id =  val.name + "selector"
-                text.addEventListener('click', selectorClick, false);
-                text.value = val.value;
-                text.text = val.name;
-                text.innerHTML= val.name;
+                var button = newEl('button'); 
+                button.classList.add("selectorRow")
+                button.classList.add("selector")
+                button.classList.add("btn")
+                button.name = val.name + "selector"
+                button.id =  val.name + "selector"
+                button.style.backgroundColor = val.color;
+                button.classList.add('addBorder');
+                button.addEventListener('click', selectorClick, false);
+                button.value = val.value;
+                button.text = val.name;
+                button.innerHTML= val.name;
 
                 if(val.value == selected){
-                container.classList.add('selected');
+                button.classList.add('selected');
                 }
-
-                container.appendChild(text);
             
-                byId('iconSelector').appendChild(container);
+                byId('iconSelector').appendChild(button);
             }
            
 }
