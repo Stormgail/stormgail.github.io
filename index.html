@@ -553,6 +553,8 @@ function buildGrid()
             curCell.id = "select" + formatGridPosition(x,y)
             curCell.addEventListener('click', onGridValueChanged, false);
             curCell.classList.add("square");
+            curCell.classList.add("btn");
+            curCell.classList.add('addBorder');
             curRow.appendChild(curCell);
         }
     }
