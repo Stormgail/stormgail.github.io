@@ -25,6 +25,7 @@ p{
     height:50px;
     display: inline-block;
     margin: 1px;
+    border: 1px solid black;
 }
 
 .selectorSection{
@@ -44,7 +45,7 @@ p{
 }
 
 .selected.addBorder{
-    border: 3px solid green;
+    border: 3px solid gold;
     border-collapse:collapse;
 }
 
@@ -55,8 +56,8 @@ p{
 }
 
 
-.bestMatch {
-     background: green;
+td.bestMatch {
+    border: 3px solid green;
 }
         
 </style>
@@ -88,7 +89,7 @@ var mediumFound = false;
 
 var hasErrors = true;
 
-var selected = null;
+var selected = metal;
 
 
 var values = [
@@ -105,7 +106,7 @@ var values = [
     ,
     {name:"Fox",
     value: fox,
-    color : "gold"}
+    color : "orange"}
     ,
     {name:"Chest/Present",
     value: medium,
@@ -331,50 +332,12 @@ return xpos + "/" + ypos;
 }
 
 
-function onGridValueChanged(evt)
-{
-    grid[this.name].type = this.value;
-
-    recalculateGrid();
-}
-
 
 function clearGridValuesSection()
 {
     byId('tblDebug').innerHTML = '';
 }
 
-function buildGridValuesSection()
-{
-    clearGridValuesSection();
-
-
-    var tbl, curRow, curCell, container;
-    tbl = newEl('table');
-    var x, y;
-    for (y=0; y<nRows; y++)
-    {
-        curRow = newEl('tr');
-        tbl.appendChild(curRow);
-
-        for (x=0; x<nCols; x++)
-        {
-            container = newEl("td");
-            container.classList.add("square");
-            container.classList.add("addBorder")
-            container.setAttribute("id","display"+formatGridPosition(x,y))       
-          
-            curCell = newEl('p');
-            
-            curCell.setAttribute("type", "text");
-            curCell.value =  grid[formatGridPosition(x,y)].value;
-            curCell.innerHTML = grid[formatGridPosition(x,y)].value;
-            container.appendChild(curCell)
-            curRow.appendChild(container);
-        }
-    }
-    byId('tblDebug').appendChild(tbl);
-}
 
 
 function validateGrid()
@@ -414,7 +377,7 @@ function validateGrid()
                 mediumCount++
             }
 
-            byId("select"+formatGridPosition(x,y)).className = "";
+            byId("select"+formatGridPosition(x,y)).classList.remove("bestMatch")
 
             tile.value = 0;
         }
@@ -521,6 +484,39 @@ function selectorClick(evt){
     buildSelector();
 }
 
+
+function buildGridValuesSection()
+{
+    clearGridValuesSection();
+
+
+    var tbl, curRow, curCell, container;
+    tbl = newEl('table');
+    var x, y;
+    for (y=0; y<nRows; y++)
+    {
+        curRow = newEl('tr');
+        tbl.appendChild(curRow);
+
+        for (x=0; x<nCols; x++)
+        {
+            container = newEl("td");
+            container.classList.add("square");
+            container.classList.add("addBorder")
+            container.setAttribute("id","display"+formatGridPosition(x,y))       
+          
+            curCell = newEl('p');
+            
+            curCell.setAttribute("type", "text");
+            curCell.value =  grid[formatGridPosition(x,y)].value;
+            curCell.innerHTML = grid[formatGridPosition(x,y)].value;
+            container.appendChild(curCell)
+            curRow.appendChild(container);
+        }
+    }
+    byId('tblDebug').appendChild(tbl);
+}
+
 function buildGrid()
 {
     byId('tblTgt').innerHTML = '';
@@ -536,30 +532,39 @@ function buildGrid()
 
         for (x=0; x<nCols; x++)
         {
-            container = newEl('td');
-            container.classList.add("selector")
+  
             grid[formatGridPosition(x,y)] = {
                 x: x,
                 y: y,
                 type: unrevealed,
                 value: 0
             }
-            curCell = newEl('select');
+            curCell = newEl('td');
             curCell.name = formatGridPosition(x,y)
             curCell.id = "select" + formatGridPosition(x,y)
-            curCell.addEventListener('change', onGridValueChanged, false);
-            
-            for (const val of values){
-                var option = document.createElement("option");
-                option.value = val.value;
-                option.text = val.name;
-                curCell.appendChild(option);
-            }
-            container.appendChild(curCell)
-            //curCell.innerText = "[" + x + "," + y + "]";
-            curRow.appendChild(container);
+            curCell.addEventListener('click', onGridValueChanged, false);
+            curCell.classList.add("square");
+            curRow.appendChild(curCell);
         }
     }
+
+    
+    function onGridValueChanged(evt)
+    {
+    grid[this.name].type = selected;
+
+    for (const val of values){
+        if(val.value == selected){
+            this.style.backgroundColor = val.color;
+        }
+    }
+    
+
+    recalculateGrid();
+    }
+
+
+
     byId('tblTgt').appendChild(tbl);
 }
 
@@ -589,8 +594,9 @@ function buildGrid()
     </div>#
     <div class="container">
         <ul>
-            <li>Fill in all the metal tiles you can see in the grid above</li>
-            <li>The tiles with the highest value (Green) will Give you the most information</li>
+            <li>Click the bar on the left to select what tile type to fill in</li>
+            <li>Click the grid to fill in the metal tiles</li>
+            <li>The tiles with the highest value (Green border) will Give you the most information</li>
             <li>When you find a piece of a larger image in game, fill in the grid above with the whole image</li>
             <li>If you can use your Retelling, when you find the swords Icon, reveal it</li>
             <li>If you cannot use your retelling or have fully revealed the swords, then search for the Medium tile</li>
