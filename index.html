@@ -19,13 +19,14 @@ p{
 .container.hiddenSection{
     display:none;
 }
-.square
+
+.btn.square
 {
     width: 50px;
     height:50px;
     display: inline-block;
     margin: 1px;
-    border: 1px solid black;
+    border: 2px solid grey;
 }
 
 .selectorSection{
@@ -67,7 +68,7 @@ p{
 }
 
 
-td.bestMatch {
+.btn.bestMatch {
     border: 3px solid green;
 }
         
@@ -554,7 +555,7 @@ function buildGrid()
             curCell.addEventListener('click', onGridValueChanged, false);
             curCell.classList.add("square");
             curCell.classList.add("btn");
-            curCell.classList.add('addBorder');
+            //curCell.classList.add('addBorder');
             curRow.appendChild(curCell);
         }
     }
