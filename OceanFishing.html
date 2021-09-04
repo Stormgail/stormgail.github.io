@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        td {
+            text-align: center;
+        }
+
+
+        p {
+            vertical-align: middle;
+        }
+
+        .container.hiddenSection {
+            display: none;
+        }
+
+        .btn.square {
+            width: 50px;
+            height: 50px;
+            display: inline-block;
+            margin: 1px;
+            border: 2px solid grey;
+        }
+
+        .selectorSection {
+            margin-right: 10px;
+            align-self: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .selectorRow {
+            margin: 2px;
+        }
+
+        .btn {
+            display: flex
+        }
+
+        .btn.addBorder {
+            border: 2px solid gray;
+            border-collapse: collapse;
+        }
+
+        .message {
+            border: 3px solid blueviolet;
+            border-collapse: collapse;
+            background-color: beige;
+            text-emphasis: form;
+        }
+
+        .selected.addBorder {
+            border: 2px solid green;
+            border-collapse: collapse;
+        }
+
+
+        .container {
+            display: flex;
+            justify-content: center;
+        }
+
+
+        .btn.bestMatch {
+            border: 3px solid green;
+        }
+    </style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+
+    <script>
+        var GaladionBay = 0;
+        var SouthernMerlthor = 1;
+        var NorthernMerlthor = 2;
+        var RhotanoSea = 3;
+        var TheCieldalaes = 4;
+        var BloodbrineSea = 5;
+        var RothlytSound = 6 ;
+
+
+        var locations = [
+            {
+                name: "Galadion Bay",
+                value: GaladionBay,
+                base: "Krill for spectral. Surface Slap Oschon's Stone (!!) then only hook (!!!).\nIF Snow/Blizzards: Ragworm for spectral, Surface Slap Megasquid (!!).",
+                spectralDay: "Ragworm, Double Hook slow ! (>5 secs). Alternatively can use Patience II here.",
+                spectralEvening: "Plump Worm, Double Hook !!!",
+                spectralNight: "Krill, 1 Navigator's Print (!); Glowworm, 2 Heavenskey (!). Glowworm for Sothis under Fisher’s Intuition (!!!).",
+                postSpectral: "Ragworm, mooch Tossed Dagger (!) into Elder Dinicthys (!!) -> intuition for Shooting Star (!!!)"
+            },
+            {
+                name: "Southern Merlthor",
+                value: SouthernMerlthor,
+                base: "Krill for spectral. Surface Slap Momora Mora (!!!) and only hook !!!. Alternatively can slap Ghoul Barracuda (!!).\nIF Gales/Wind: can slap La Noscean Jelly",
+                spectralDay: "Krill, Double Hook (!!) (Around 5 secs, too quick will be a low value shipwreck's sail) Alternatively can use patience2 here.",
+                spectralEvening: "IF evening: Ragworm, mooch Hi-aetherlouse (!) then Double Hook if !!!, or Double Hook a slow straight catch ! (>5 secs)",
+                spectralNight: "IF night: Ragworm, if intuition procs (2x Great Grandmarlin quick !! from Hi-aetherlouse mooch) Shrimp Cage Feeder to catch Coral Manta (!!!). Alternatively can use Patience II here, Powerful Hookset for !!!.",
+                postSpectral: "Krill, Mooch Ghoul Barracuda (!!) into Gladius (!!). Plump Worm under Fisher’s Intuition for Little Leviathan (!!!)"
+            },
+            {
+                name: "Northern Merlthor",
+                value: NorthernMerlthor,
+                base: "Krill for spectral. Surface Slap Oschon's Stone (!!) then only hook (!!!).\nIF Snow/Blizzards: Ragworm for spectral, Surface Slap Megasquid (!!).",
+                spectralDay: "Plump Worm, 3 Gugrusaurus (!!!). Heavy Steel Jig to catch Elasmosaurus under intuition (!!!)",
+                spectralEvening: "Ragworm, Double Hook slow ! (>5 secs).",
+                spectralNight: "Krill Double Hook !! >5 secs.",
+                postSpectral: "Ragworm, mooch Tossed Dagger (!) into Elder Dinicthys (!!) -> intuition for Shooting Star (!!!)"
+            },
+            {
+                name: "Rhotano Sea",
+                value: RhotanoSea,
+                base: "Plump Worm for spectral. Surface Slap Chrome Hammerhead (!!!), only reel in !!!. Alternatively can slap Rhotano Wahoo (!!) or Deep Plaice (!!).",
+                spectralDay: "Plump Worm, Double Hook !!!",
+                spectralEvening: "Ragworm for Silencer (!), Rat Tail for Deep Sea Eel (!!). Catch both for intuition, then Rat Tail for Stonescale (!!!).",
+                spectralNight: "Krill, Double Hook slow ! (>5 secs)",
+                postSpectral: "Plump Worm. 2x Crimson Monkfish (!!). Krill when intuition up for Sabaton (!!!)"
+            },
+            {
+                name: "The Cieldalaes",
+                value: TheCieldalaes,
+                base: "Ragworm for spectral. Surface Slap Metallic Boxfish (!) or King Cobrafish (!!!), only hook !!!.",
+                spectralDay: "Krill, Double Hook slow !!. Alternatively can use Patience II here.",
+                spectralEvening: "Plump Worm, Double Hook slow !!. Alternatively can use Patience II here.",
+                spectralNight: "Plump Worm for 2x Jetborne Manta (fast !!!), Squid Strip for 1x Mistbeards's Cup (!!). Squid Strip for Hafgufa under intuition (!!!).",
+                postSpectral: "Ragworm 3x Metallic Boxfish (!) -> intuition, Krill for Cieldalaes Geode (!!!)"
+            },
+            {
+                name: "Bloodbrine Sea",
+                value: BloodbrineSea,
+                base: "Krill for spectral. Surface Slap True Scad (!!) then only hook !!!. Alternative can slap Sunken Mask (!!!) but it's a rare hook with Krill.",
+                spectralDay: "Ragworm, Double Hook slowish !. Alternatively, for the blue fish, Pill Bug for 3x Beatific Vision (!!), can DH 4. Pill Bug to catch Seafaring Toad (!!!) under intuition.",
+                spectralEvening: "Plump Worm, Double Hook slow !!!. Alternatively can use Patience II here.",
+                spectralNight: "Krill, Double Hook slow !!, or at higher risk/higher reward treat as evening.",
+                postSpectral: "Ragworm, 1x Sunken Mask (!!!) -> intuition, Krill for Bareface (!!!)"
+            },
+            {
+                name: "Rothlyt Sound",
+                value: RothlytSound,
+                base: "Surface Slap Thavnairian Shark (!!!), then only hook !!!. Alternatively can slap Lansquenet (!!) or Crow Puffer (!) if Thunderstorms.",
+                spectralDay: "Krill, Double Hook slow !!.",
+                spectralEvening: "Ragworm, mooch Rothlyt Mussel (!) into Trollfish (!). Mooch Rothlyt Mussel into Placodus (!!!) under intuition. Can use Patience II. Alternatively can use kKill, for a lower chance of a placodus but a chance at catching another high point fish (slow !!).",
+                spectralNight: "Krill, Double Hook slow !!.",
+                postSpectral: "Ragworm, 3x Rothlyt Kelp -> intuition for Ginkgo Fin (!!!)"
+            }
+
+        ]
+
+
+
+        
+        window.addEventListener('load', onDocLoaded, false);
+        function onDocLoaded() {
+            init()
+        }
+
+        function init() {
+            buildDropdownLists()
+        }
+
+
+        function buildDropdownLists() {
+            var select = document.createElement("select");
+
+            for (const loc of locations) {
+                var option = document.createElement("option");
+                option.value = loc.value;
+                option.text = loc.name
+                select.appendChild(option);
+            }
+
+            var label = document.createElement("label");
+            
+            var firstSelect = select.cloneNode(true);
+            firstSelect.name = "firstSelect";
+            firstSelect.id =  "firstSelect";
+
+            var firstLabel =  document.createElement("label");
+            firstLabel.innerHTML = "Please Select First Zone: "
+            firstLabel.htmlFor = "firstSelect";
+
+            document.getElementById("FirstZoneDropDown").appendChild(firstLabel).appendChild(firstSelect);
+
+
+ 
+
+            var secondSelect = select.cloneNode(true);
+            secondSelect.name = "secondSelect";
+            secondSelect.id =  "secondSelect";
+
+            
+            var secondLabel =  document.createElement("label");
+            secondLabel.innerHTML = "Please Select Second Zone: "
+            secondLabel.htmlFor = "secondSelect";
+
+            document.getElementById("SecondZoneDropDown").appendChild(secondLabel).appendChild(secondSelect);
+
+            var thirdSelect = select.cloneNode(true);
+            thirdSelect.name = "thirdSelect";
+            thirdSelect.id =  "thirdSelect";
+
+            var thirdLabel =  document.createElement("label");
+            thirdLabel.innerHTML = "Please Select Third Zone: "
+            thirdLabel.htmlFor = "thirdSelect";
+
+            document.getElementById("ThirdZoneDropDown").appendChild(thirdLabel).appendChild(thirdSelect);
+        }
+
+        function buildRadioButtons() {}
+    </script>
+</head>
+
+<body>
+    <div class="container" id='FirstZoneDropDown'>
+
+    </div>
+    <div class="container" id='FirstZoneRadio'>
+
+    </div>
+    <div class="container" id='FirstZone'>
+    test
+    </div>
+
+    <div class="container" id='SecondZoneDropDown'>
+
+    </div>
+    <div class="container" id='SecondZoneRadio'>
+
+    </div>
+    <div class="container" id='SecondZone'>
+test
+    </div>
+
+    <div class="container" id='ThirdZoneDropDown'>
+
+    </div>
+    <div class="container" id='ThirdZoneRadio'>
+
+    </div>
+    <div class="container" id='ThirdZone'>
+        test
+    </div>
+
+</body>
+
+</html>
