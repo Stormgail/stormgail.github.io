@@ -12,6 +12,14 @@
             vertical-align: middle;
         }
 
+        label{
+            margin-right: 10px;
+        }
+
+        .radio{
+            margin:100px
+        }
+
         .container.hiddenSection {
             display: none;
         }
@@ -78,7 +86,20 @@
         var RhotanoSea = 3;
         var TheCieldalaes = 4;
         var BloodbrineSea = 5;
-        var RothlytSound = 6 ;
+        var RothlytSound = 6;
+
+        var day = 11;
+        var evening = 22;
+        var night = 33;
+
+
+        var firstLocation = null;
+        var secondLocation = null;
+        var thirdLocation = null;
+
+        var firstTime = null;
+        var secondTime = null;
+        var thirdTime = null;
 
 
         var locations = [
@@ -148,16 +169,34 @@
 
         ]
 
+        var times = [
+            {
+                name: "Day ",
+                value: day,
+            },
+            {
+                name: "Evening ",
+                value: evening,
+            },
+            {
+                name: "Night ",
+                value: night,
+            }
 
 
-        
+        ]
+
+
+
+
         window.addEventListener('load', onDocLoaded, false);
         function onDocLoaded() {
-            init()
+            init();
         }
 
         function init() {
-            buildDropdownLists()
+            buildDropdownLists();
+            buildRadioButtons();
         }
 
 
@@ -172,26 +211,24 @@
             }
 
             var label = document.createElement("label");
-            
+
             var firstSelect = select.cloneNode(true);
             firstSelect.name = "firstSelect";
-            firstSelect.id =  "firstSelect";
+            firstSelect.id = "firstSelect";
 
-            var firstLabel =  document.createElement("label");
+            var firstLabel = document.createElement("label");
             firstLabel.innerHTML = "Please Select First Zone: "
             firstLabel.htmlFor = "firstSelect";
 
             document.getElementById("FirstZoneDropDown").appendChild(firstLabel).appendChild(firstSelect);
 
 
- 
-
             var secondSelect = select.cloneNode(true);
             secondSelect.name = "secondSelect";
-            secondSelect.id =  "secondSelect";
+            secondSelect.id = "secondSelect";
 
-            
-            var secondLabel =  document.createElement("label");
+
+            var secondLabel = document.createElement("label");
             secondLabel.innerHTML = "Please Select Second Zone: "
             secondLabel.htmlFor = "secondSelect";
 
@@ -199,16 +236,46 @@
 
             var thirdSelect = select.cloneNode(true);
             thirdSelect.name = "thirdSelect";
-            thirdSelect.id =  "thirdSelect";
+            thirdSelect.id = "thirdSelect";
 
-            var thirdLabel =  document.createElement("label");
+            var thirdLabel = document.createElement("label");
             thirdLabel.innerHTML = "Please Select Third Zone: "
             thirdLabel.htmlFor = "thirdSelect";
 
             document.getElementById("ThirdZoneDropDown").appendChild(thirdLabel).appendChild(thirdSelect);
         }
 
-        function buildRadioButtons() {}
+        function buildRadioButtons() {
+            buildRadioButtonGroup("first","FirstZoneRadio");
+            buildRadioButtonGroup("second","SecondZoneRadio");
+            buildRadioButtonGroup("third","ThirdZoneRadio");
+        }
+
+        function buildRadioButtonGroup(stringToAppend,container) {
+            var radioList = []
+
+            var element = document.getElementById(container);
+
+            for (const time of times) {
+
+                var radio = document.createElement('input');
+                var label = document.createElement('label');
+                radio.type = 'radio';
+                radio.id = stringToAppend + time.name
+                radio.name = stringToAppend + "Radio";
+                radio.value = time.value;
+                
+
+                label.setAttribute("for", stringToAppend + time.name);
+                label.innerHTML = time.name;
+
+                radioList.push({ label: label, radio: radio });
+
+                element.appendChild(label).appendChild(radio);
+            }
+
+
+        }
     </script>
 </head>
 
@@ -220,7 +287,7 @@
 
     </div>
     <div class="container" id='FirstZone'>
-    test
+        test
     </div>
 
     <div class="container" id='SecondZoneDropDown'>
@@ -230,7 +297,7 @@
 
     </div>
     <div class="container" id='SecondZone'>
-test
+        test
     </div>
 
     <div class="container" id='ThirdZoneDropDown'>
