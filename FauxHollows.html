@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style>
+
+td{
+    text-align: center; 
+}
+select{
+    width: 50px;
+    height:50px;
+}
+
+p{
+    vertical-align: middle;
+}
+
+.container.hiddenSection{
+    display:none;
+}
+
+.btn.square
+{
+    width: 50px;
+    height:50px;
+    display: inline-block;
+    margin: 1px;
+    border: 2px solid grey;
+}
+
+.selectorSection{
+    margin-right: 10px;
+    align-self:center;
+    display:flex;
+    flex-direction:column;
+}
+
+.selectorRow{
+    margin:2px;
+}
+
+.btn{
+    display:flex
+}
+
+.btn.addBorder{
+    border: 2px solid gray;
+    border-collapse:collapse;
+}
+
+.message{
+    border: 3px solid blueviolet;
+    border-collapse:collapse;
+    background-color: beige;
+    text-emphasis: form;
+}
+
+.selected.addBorder{
+    border: 2px solid green;
+    border-collapse:collapse;
+}
+
+
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+
+.btn.bestMatch {
+    border: 3px solid green;
+}
+        
+</style>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+<script>
+"use strict";
+function byId(e){return document.getElementById(e);}
+function newEl(tag){return document.createElement(tag);}
+
+window.addEventListener('load', onDocLoaded, false);
+
+var grid = {};
+
+var unrevealed = 0;
+var empty = -2;
+var metal = -1;
+var fox = 1;
+var medium = 2;
+var swords = 3;
+
+var nCols = 6;
+var nRows = 6;
+
+var wantRetelling = false;
+
+var swordFound = false;
+var mediumFound = false;
+
+var hasErrors = true;
+
+var selected = metal;
+
+
+var values = [
+    {name:"Unrevealed",
+    value: unrevealed,
+    color : "white"},
+    {name:"Empty",
+    value: empty,
+    color : "red"}
+    ,
+    {name:"Metal",
+    value: metal,
+    color : "darkgrey"}
+    ,
+    {name:"Fox",
+    value: fox,
+    color : "orange"}
+    ,
+    {name:"Chest/Present",
+    value: medium,
+    color : "brown"}
+    ,
+    {name:"Swords",
+    value: swords,
+    color : "lightblue"}
+]
+
+function onDocLoaded()
+{
+init()
+}
+
+function init(){
+    buildGrid();
+    recalculateGrid();
+    buildSelector();
+}
+
+function withinBounds(x,y)
+{
+if(x>=0 && y>=0 && x<=(nCols-1) && y<=(nRows-1)){
+    return true
+}
+return false;
+}
+
+function canPlace(type, tile, onlyExactMatch){
+    if (tile.type == type || (tile.type == unrevealed && !onlyExactMatch)){
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+function tryFitTiles(xStart,yStart){
+    if(!mediumFound && tryFitMedium(xStart,yStart)){
+        scoreMedium(xStart,yStart)
+    }
+    if(!swordFound){
+        if(tryFitLongSide(xStart,yStart)){
+            scoreLongSide(xStart,yStart);
+        }
+        if(tryFitLongTall(xStart,yStart)){
+            scoreLongTall(xStart,yStart);
+        }
+
+    }
+}
+
+
+function tryFitMedium(xStart,yStart)
+{
+    return tryFitMedium(xStart,yStart,false)
+}
+
+
+function tryFitMedium(xStart,yStart,onlyExactMatch)
+{
+    return canFit(xStart,yStart,1,1,medium,onlyExactMatch)
+}
+
+function scoreMedium(xStart,yStart){
+    addValueToTiles(xStart,yStart,1,1,4)
+}
+
+
+function tryFitLongSide(xStart,yStart)
+{
+    return tryFitLongSide(xStart,yStart,false)
+}
+
+
+function tryFitLongSide(xStart,yStart,onlyExactMatch)
+{
+    return canFit(xStart,yStart,2,1,swords,onlyExactMatch);
+}
+
+function scoreLongSide(xStart,yStart){
+    
+    addValueToTiles(xStart,yStart,2,1,6);
+}
+
+function tryFitLongTall(xStart,yStart)
+{
+    return tryFitLongTall(xStart,yStart,false);
+}
+
+
+function tryFitLongTall(xStart,yStart,onlyExactMatch)
+{
+    return canFit(xStart,yStart,1,2,swords,onlyExactMatch);
+}
+
+function scoreLongTall(xStart,yStart){
+    addValueToTiles(xStart,yStart,1,2,6);
+}
+
+
+
+function canFit(xStart, yStart, xSize,ySize, type)
+{
+   return canFit(xStart, yStart, xSize,ySize, type, false)
+}
+
+
+function canFit(xStart, yStart, xSize,ySize, type, onlyExactMatch)
+{
+    var canPlaceTile = true;
+
+    if(!withinBounds((xStart+xSize),(yStart+ySize))){
+        return false;
+    }
+
+    var x, y;
+    for (y=0; y<=ySize; y++)
+    {
+
+        for (x=0; x<=xSize; x++)
+        {
+
+            var currentXPos = xStart + x;
+            var currentYPos =  yStart + y;
+            
+            var tile = grid[formatGridPosition(currentXPos,currentYPos)]
+            
+            canPlaceTile = canPlace(type,tile,onlyExactMatch);
+
+            if(!canPlaceTile){
+                return false;
+            }
+        }
+
+    }  
+
+    return canPlaceTile;
+}
+
+function addValueToTiles(xStart, yStart, xSize,ySize,valueToAdd)
+{
+
+    var x, y;
+    for (y=0; y<=ySize; y++)
+    {
+
+        for (x=0; x<=xSize; x++)
+        {
+
+            var currentXPos = xStart + x;
+            var currentYPos =  yStart + y;
+            
+            var tile = grid[formatGridPosition(currentXPos,currentYPos)]
+            
+           tile.value+= valueToAdd;
+        }
+
+    }  
+
+}
+
+function recalculateGrid(){
+    clearGridValuesSection()
+    validateGrid();
+
+    if(!hasErrors){
+
+    var x, y;
+    for (y=0; y<nRows; y++)
+    {
+        for (x=0; x<nCols; x++)
+        {
+            tryFitTiles(x,y)
+        }
+
+    }
+
+    buildGridValuesSection();
+
+    hightlightHighestRows()
+    }
+}
+
+
+
+function hightlightHighestRows(){
+    
+    var x, y, max;
+    max = 0;
+    for (y=0; y<nRows; y++)
+    {
+        for (x=0; x<nCols; x++)
+        {
+            var tile = grid[formatGridPosition(x,y)];
+            if(tile.value>max){
+                max = tile.value;
+            }
+        }
+
+    }
+
+
+    for (y=0; y<nRows; y++)
+    {
+        for (x=0; x<nCols; x++)
+        {
+            var tile = grid[formatGridPosition(x,y)];
+            if(tile.value==max){
+                byId("select"+formatGridPosition(x,y)).classList.add("bestMatch")
+                byId("display"+formatGridPosition(x,y)).classList.add("bestMatch")
+            }
+        }
+
+    }
+}
+
+function formatGridPosition(xpos,ypos){
+
+return xpos + "/" + ypos;
+}
+
+
+
+function clearGridValuesSection()
+{
+    byId('tblDebug').innerHTML = '';
+}
+
+
+
+function validateGrid()
+{
+    clearErrors();
+    //Reset values
+    hasErrors = false;
+    swordFound = false;
+    mediumFound = false;
+
+
+    var swordCount = 0;
+    var mediumCount = 0;
+
+    var firstSword;
+
+    var firstMedium;
+
+    var x, y;
+    for (y=0; y<nRows; y++)
+    {     
+
+        for (x=0; x<nCols; x++)
+        {
+            var tile = grid[formatGridPosition(x,y)];
+            if(tile.type == swords){
+                if(!firstSword){
+                    firstSword = tile;
+                }
+                swordCount++
+            }else if(tile.type == medium){
+                
+                if(!firstMedium){
+                    firstMedium = tile;
+                }
+
+                mediumCount++
+            }
+
+            byId("select"+formatGridPosition(x,y)).classList.remove("bestMatch")
+
+            tile.value = 0;
+        }
+    }
+
+    if(mediumCount<4 && mediumCount > 0){
+        addError("If you have Found one medium tile, please fill in the rest.")
+    }
+
+    if(swordCount<6  && swordCount > 0){
+
+        addError("If you have Found one swords tile, please fill in the rest.")
+    }
+
+    if(mediumCount==4)
+    {
+        if(tryFitMedium(firstMedium.x,firstMedium.y,true)){
+            mediumFound = true;
+        }
+        else
+        {     
+        addError("Please double check your chest/present position")
+        }
+        
+    }
+
+    if(swordCount==6){
+
+        if(tryFitLongTall(firstSword.x,firstSword.y,true) || tryFitLongSide(firstSword.x,firstSword.y,true)){
+            swordFound = true;
+        }
+        else{     
+        addError("Please double check your swords position")
+        }
+    }
+
+    if(mediumCount>4){
+        addError("You have too many Medium tiles")
+    }
+
+    if(swordCount>6){        
+        addError("You have too many Sword tiles")
+    }
+
+}
+
+function clearErrors()
+{
+    byId('MessageSection').innerHTML = '';
+}
+
+function addError(errorText)
+{
+    hasErrors = true;
+    var error, curRow;
+
+    curRow = newEl('tr');
+    error = newEl('text');
+    error.innerHTML =  '<p>' + errorText + '</p>'
+    curRow.classList.add("message")
+    curRow.appendChild(error);
+    byId('MessageSection').appendChild(curRow);
+}
+
+function buildSelector()
+{
+    byId('iconSelector').innerHTML = '';
+
+    var container;
+   
+   
+    for (const val of values){
+                
+
+
+
+                var button = newEl('button'); 
+                button.classList.add("selectorRow")
+                button.classList.add("selector")
+                button.classList.add("btn")
+                button.name = val.name + "selector"
+                button.id =  val.name + "selector"
+                button.style.backgroundColor = val.color;
+                button.classList.add('addBorder');
+                button.addEventListener('click', selectorClick, false);
+                button.value = val.value;
+                button.text = val.name;
+                button.innerHTML= val.name;
+
+                if(val.value == selected){
+                button.classList.add('selected');
+                }
+            
+                byId('iconSelector').appendChild(button);
+            }
+           
+}
+
+function selectorClick(evt){
+
+    selected = this.value;
+    buildSelector();
+}
+
+
+function buildGridValuesSection()
+{
+    clearGridValuesSection();
+
+
+    var tbl, curRow, curCell, container;
+    tbl = newEl('table');
+    var x, y;
+    for (y=0; y<nRows; y++)
+    {
+        curRow = newEl('tr');
+        tbl.appendChild(curRow);
+
+        for (x=0; x<nCols; x++)
+        {
+            container = newEl("td");
+            container.classList.add("square");
+            container.classList.add("addBorder")
+            container.setAttribute("id","display"+formatGridPosition(x,y))       
+          
+            curCell = newEl('p');
+            
+            curCell.setAttribute("type", "text");
+            curCell.value =  grid[formatGridPosition(x,y)].value;
+            curCell.innerHTML = grid[formatGridPosition(x,y)].value;
+            container.appendChild(curCell)
+            curRow.appendChild(container);
+        }
+    }
+    byId('tblDebug').appendChild(tbl);
+}
+
+function buildGrid()
+{
+    byId('tblTgt').innerHTML = '';
+
+    grid = {};
+    var tbl, curRow, curCell, container;
+    tbl = newEl('table');
+    var x, y;
+    for (y=0; y<nRows; y++)
+    {
+        curRow = newEl('tr');
+        tbl.appendChild(curRow);
+
+        for (x=0; x<nCols; x++)
+        {
+  
+            grid[formatGridPosition(x,y)] = {
+                x: x,
+                y: y,
+                type: unrevealed,
+                value: 0
+            }
+            curCell = newEl('td');
+            curCell.name = formatGridPosition(x,y)
+            curCell.id = "select" + formatGridPosition(x,y)
+            curCell.addEventListener('click', onGridValueChanged, false);
+            curCell.classList.add("square");
+            curCell.classList.add("btn");
+            //curCell.classList.add('addBorder');
+            curRow.appendChild(curCell);
+        }
+    }
+
+    
+    function onGridValueChanged(evt)
+    {
+    grid[this.name].type = selected;
+
+    for (const val of values){
+        if(val.value == selected){
+            this.style.backgroundColor = val.color;
+        }
+    }
+    
+
+    recalculateGrid();
+    }
+
+
+
+    byId('tblTgt').appendChild(tbl);
+}
+
+</script>
+<style>
+
+</style>
+</head>
+<body>
+
+    <div class="container"><h2>Faux Hollow Solver</h2></div>
+    <div class="container" ><table id='MessageSection'></table></div>
+    <hr>
+    <div class="container">
+    <div id='iconSelector' class="selectorSection"></div>
+    <div id='tblTgt'></div>
+    </div>
+    <hr>
+    <div class="container" >
+        
+    <button onclick="init()" class ='btn btn-dark'>Reset</button>
+</div>
+    
+
+    <div id='tblDebug' class="hiddenSection container" ></div>
+    <hr>
+    <div id='instructions' >
+        <div class="container">
+        <h2>How to Use</h2>
+    </div>#
+    <div class="container">
+        <ul>
+            <li>Click the bar on the left to select what tile type to fill in</li>
+            <li>Click the grid to fill in the metal tiles</li>
+            <li>The tiles with the highest value (Green border) will Give you the most information</li>
+            <li>When you find a piece of a larger image in game, fill in the grid above with the whole image</li>
+            <li>If you can use your Retelling, when you find the swords Icon, reveal it</li>
+            <li>If you cannot use your retelling or have fully revealed the swords, then search for the Medium tile</li>
+            <li>If you can complete the medium tile with remaining reveals, do so</li>
+            <li>If you cannot finish a larger tile, search for the chance of the Bonus tile (avoid spaces you know are parts of bigger tiles)</li>
+        </ul>
+    </div>
+    <div class="container">
+        <p>By Gail Larkspur @ Omega</p>
+    </div>
+</div>
+</body>
+</html>
