@@ -12,44 +12,8 @@
             vertical-align: middle;
         }
 
-        label{
+        label {
             margin-right: 10px;
-        }
-
-        .radio{
-            margin:100px
-        }
-
-        .container.hiddenSection {
-            display: none;
-        }
-
-        .btn.square {
-            width: 50px;
-            height: 50px;
-            display: inline-block;
-            margin: 1px;
-            border: 2px solid grey;
-        }
-
-        .selectorSection {
-            margin-right: 10px;
-            align-self: center;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .selectorRow {
-            margin: 2px;
-        }
-
-        .btn {
-            display: flex
-        }
-
-        .btn.addBorder {
-            border: 2px solid gray;
-            border-collapse: collapse;
         }
 
         .message {
@@ -59,20 +23,10 @@
             text-emphasis: form;
         }
 
-        .selected.addBorder {
-            border: 2px solid green;
-            border-collapse: collapse;
-        }
-
 
         .container {
             display: flex;
             justify-content: center;
-        }
-
-
-        .btn.bestMatch {
-            border: 3px solid green;
         }
     </style>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -93,9 +47,9 @@
         var night = 33;
 
 
-        var firstLocation = null;
-        var secondLocation = null;
-        var thirdLocation = null;
+        var firstLocation = GaladionBay;
+        var secondLocation = GaladionBay;
+        var thirdLocation = GaladionBay;
 
         var firstTime = null;
         var secondTime = null;
@@ -162,7 +116,7 @@
                 value: RothlytSound,
                 base: "Surface Slap Thavnairian Shark (!!!), then only hook !!!. Alternatively can slap Lansquenet (!!) or Crow Puffer (!) if Thunderstorms.",
                 spectralDay: "Krill, Double Hook slow !!.",
-                spectralEvening: "Ragworm, mooch Rothlyt Mussel (!) into Trollfish (!). Mooch Rothlyt Mussel into Placodus (!!!) under intuition. Can use Patience II. Alternatively can use kKill, for a lower chance of a placodus but a chance at catching another high point fish (slow !!).",
+                spectralEvening: "Ragworm, mooch Rothlyt Mussel (!) into Trollfish (!). Mooch Rothlyt Mussel into Placodus (!!!) under intuition. Can use Patience II. Alternatively can use Krill, for a lower chance of a placodus but a chance at catching another high point fish (slow !!).",
                 spectralNight: "Krill, Double Hook slow !!.",
                 postSpectral: "Ragworm, 3x Rothlyt Kelp -> intuition for Ginkgo Fin (!!!)"
             }
@@ -197,10 +151,101 @@
         function init() {
             buildDropdownLists();
             buildRadioButtons();
+            loadData()
+        }
+
+        function loadData() {
+            loadDataForStop(firstLocation, firstTime, "FirstZone");
+            loadDataForStop(secondLocation, secondTime, "SecondZone");
+            loadDataForStop(thirdLocation, thirdTime, "ThirdZone");
+        }
+
+        function loadDataForStop(loc, time, container) {
+
+            const para = document.createElement("p");
+            var element = document.getElementById(container);
+            element.innerHTML = "";
+            if (time) {
+                var loc = locations[loc];
+
+                var locBase = loc.base;
+                var locPost = loc.postSpectral;
+                var locSpec;
+                switch (parseInt(time)) {
+                    case day:
+                        locSpec = loc.spectralDay;
+                        break;
+                    case evening:
+                        locSpec = loc.spectralEvening;
+                        break;
+                    case night:
+                        locSpec = loc.spectralNight;
+                        break;
+                }
+
+
+
+
+                para.appendChild(buildTextNode("Start"));
+                para.appendChild(buildBreakNode());
+                para.appendChild(buildTextNode(locBase));
+                para.appendChild(buildBreakNode());
+                para.appendChild(buildTextNode("If Spectral"));
+
+                para.appendChild(buildBreakNode());
+                para.appendChild(buildTextNode(locSpec));
+                para.appendChild(buildBreakNode());
+                para.appendChild(buildTextNode("After Spectral"));
+
+                para.appendChild(buildBreakNode());
+                para.appendChild(buildTextNode(locPost));
+                para.appendChild(buildBreakNode());
+
+
+
+            } else {
+                para.appendChild(buildTextNode("Please Select Time and Location"));
+            }
+
+
+            element.appendChild(para);
+        }
+
+        function buildTextNode(text) {
+            return document.createTextNode(text);
+        }
+
+        function buildBreakNode() {
+            return linebreak = document.createElement("br");
+
         }
 
 
+        function setFirstLocation() {
+            firstLocation = this.value;
+            loadData();
+        }
+
+        function setSecondLocation() {
+            secondLocation = this.value;
+            loadData();
+        }
+
+
+        function setThirdLocation() {
+            thirdLocation = this.value;
+            loadData();
+        }
+
         function buildDropdownLists() {
+
+            buildDropdownList("first", "FirstZoneDropDown", setFirstLocation)
+            buildDropdownList("second", "SecondZoneDropDown", setSecondLocation)
+            buildDropdownList("third", "ThirdZoneDropDown", setThirdLocation)
+        }
+
+        function buildDropdownList(stringToAppend, container, func) {
+
             var select = document.createElement("select");
 
             for (const loc of locations) {
@@ -210,48 +255,48 @@
                 select.appendChild(option);
             }
 
+            select.name = stringToAppend + "Select";
+            select.id = stringToAppend + "Select";
+
+            select.addEventListener('change', func, false);
+
+
             var label = document.createElement("label");
+            label.innerHTML = "Please Select " + stringToAppend[0].toUpperCase() + stringToAppend.substring(1) + " Zone: "
+            label.htmlFor = stringToAppend + "Select";
 
-            var firstSelect = select.cloneNode(true);
-            firstSelect.name = "firstSelect";
-            firstSelect.id = "firstSelect";
+            document.getElementById(container).appendChild(label).appendChild(select);
 
-            var firstLabel = document.createElement("label");
-            firstLabel.innerHTML = "Please Select First Zone: "
-            firstLabel.htmlFor = "firstSelect";
-
-            document.getElementById("FirstZoneDropDown").appendChild(firstLabel).appendChild(firstSelect);
-
-
-            var secondSelect = select.cloneNode(true);
-            secondSelect.name = "secondSelect";
-            secondSelect.id = "secondSelect";
-
-
-            var secondLabel = document.createElement("label");
-            secondLabel.innerHTML = "Please Select Second Zone: "
-            secondLabel.htmlFor = "secondSelect";
-
-            document.getElementById("SecondZoneDropDown").appendChild(secondLabel).appendChild(secondSelect);
-
-            var thirdSelect = select.cloneNode(true);
-            thirdSelect.name = "thirdSelect";
-            thirdSelect.id = "thirdSelect";
-
-            var thirdLabel = document.createElement("label");
-            thirdLabel.innerHTML = "Please Select Third Zone: "
-            thirdLabel.htmlFor = "thirdSelect";
-
-            document.getElementById("ThirdZoneDropDown").appendChild(thirdLabel).appendChild(thirdSelect);
         }
+
+
+
+
+        function setFirstTime() {
+            firstTime = this.value;
+            loadData();
+        }
+
+        function setSecondTime() {
+            secondTime = this.value;
+            loadData();
+        }
+
+        function setThirdTime() {
+            thirdTime = this.value;
+            loadData();
+        }
+
 
         function buildRadioButtons() {
-            buildRadioButtonGroup("first","FirstZoneRadio");
-            buildRadioButtonGroup("second","SecondZoneRadio");
-            buildRadioButtonGroup("third","ThirdZoneRadio");
+            buildRadioButtonGroup("first", "FirstZoneRadio", setFirstTime);
+            buildRadioButtonGroup("second", "SecondZoneRadio", setSecondTime);
+            buildRadioButtonGroup("third", "ThirdZoneRadio", setThirdTime);
         }
 
-        function buildRadioButtonGroup(stringToAppend,container) {
+
+
+        function buildRadioButtonGroup(stringToAppend, container, func) {
             var radioList = []
 
             var element = document.getElementById(container);
@@ -264,7 +309,10 @@
                 radio.id = stringToAppend + time.name
                 radio.name = stringToAppend + "Radio";
                 radio.value = time.value;
-                
+
+                radio.addEventListener('change', func, false);
+
+
 
                 label.setAttribute("for", stringToAppend + time.name);
                 label.innerHTML = time.name;
@@ -272,7 +320,11 @@
                 radioList.push({ label: label, radio: radio });
 
                 element.appendChild(label).appendChild(radio);
+
             }
+
+
+
 
 
         }
@@ -287,7 +339,7 @@
 
     </div>
     <div class="container" id='FirstZone'>
-        test
+
     </div>
 
     <div class="container" id='SecondZoneDropDown'>
@@ -297,7 +349,7 @@
 
     </div>
     <div class="container" id='SecondZone'>
-        test
+
     </div>
 
     <div class="container" id='ThirdZoneDropDown'>
@@ -307,7 +359,7 @@
 
     </div>
     <div class="container" id='ThirdZone'>
-        test
+
     </div>
 
 </body>
