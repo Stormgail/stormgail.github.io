@@ -11,6 +11,7 @@
         p {
             vertical-align: middle;
             white-space: pre;
+            text-align: center;
         }
 
         label {
@@ -34,7 +35,7 @@
         .textSection {
             border: 3px solid lightgray;
             min-width: 500 px;
-            min-height: 150px;
+            min-height: 200px;
         }
     </style>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -63,7 +64,66 @@
         var secondTime = null;
         var thirdTime = null;
 
+        var krill = 0;
+        var ragWorm = 1;
+        var plumpWorm = 2;
+        var glowWorm = 3;
+        var shrimpCageFeeder = 4;
+        var ratTail = 5;
+        var squidStrip = 6;
+        var heavySteelJig = 7;
+        var pillBug = 8;
 
+        var baitList = [
+            {
+                value: false,
+                image: "Images/Krill_Icon.png",
+                text: "krill"
+            }
+            ,
+            {
+                value: false,
+                image: "Images/Ragworm_Icon.png",
+                text: "Ragworm"
+            },
+            {
+                value: false,
+                image: "Images/Plump_Worm_Icon.png",
+                text: "Plump Worm"
+            },
+            {
+                value: false,
+                image: "Images/Glowworm_Icon.png",
+                text: "Glow Worm"
+            },
+            {
+                value: false,
+                image: "Images/Shrimp_Cage_Feeder_Icon.png",
+                text: "Shrimp Cage Feeder"
+            },
+            {
+                value: false,
+                image: "Images/Rat_Tail_Icon.png",
+                text: "Rat Tail"
+            },
+            {
+                value: false,
+                image: "Images/Squid_Strip_Icon.png",
+                text: "Squid Strip"
+            },
+            {
+                value: false,
+                image: "Images/Heavy_Steel_Jig_Icon.png",
+                text: "Heavy Steel Jig"
+            },
+            {
+                value: false,
+                image: "Images/Pill_Bug_Icon.png",
+                text: "Pill Bug"
+            }];
+
+
+            
         var locations = [
             {
                 name: "Galadion Bay",
@@ -72,7 +132,11 @@
                 spectralDay: "Ragworm, Double Hook slow ! (>5 secs). Alternatively can use Patience II here.",
                 spectralEvening: "Plump Worm, Double Hook !!!",
                 spectralNight: "Krill, 1 Navigator's Print (!); Glowworm, 2 Heavenskey (!). Glowworm for Sothis under Fisher’s Intuition (!!!).",
-                postSpectral: "Ragworm, mooch Tossed Dagger (!) into Elder Dinicthys (!!) -> intuition for Shooting Star (!!!)"
+                postSpectral: "Ragworm, mooch Tossed Dagger (!) into Elder Dinicthys (!!) -> intuition for Shooting Star (!!!)",
+                bait: [krill, ragWorm],
+                dayBait: [ragWorm],
+                eveBait: [plumpWorm],
+                nightBait: [krill, glowWorm],
             },
             {
                 name: "Southern Merlthor",
@@ -80,8 +144,12 @@
                 base: "Krill for spectral. Surface Slap Momora Mora (!!!) and only hook !!!. Alternatively can slap Ghoul Barracuda (!!).\nIF Gales/Wind: can slap La Noscean Jelly",
                 spectralDay: "Krill, Double Hook (!!) (Around 5 secs, too quick will be a low value shipwreck's sail) Alternatively can use patience2 here.",
                 spectralEvening: "IF evening: Ragworm, mooch Hi-aetherlouse (!) then Double Hook if !!!, or Double Hook a slow straight catch ! (>5 secs)",
-                spectralNight: "IF night: Ragworm, if intuition procs (2x Great Grandmarlin quick !! from Hi-aetherlouse mooch) Shrimp Cage Feeder to catch Coral Manta (!!!). Alternatively can use Patience II here, Powerful Hookset for !!!.",
-                postSpectral: "Krill, Mooch Ghoul Barracuda (!!) into Gladius (!!). Plump Worm under Fisher’s Intuition for Little Leviathan (!!!)"
+                spectralNight: "IF night: Ragworm, if intuition procs (2x Great Grandmarlin quick !! from Hi-aetherlouse mooch) Shrimp Cage Feeder to catch Coral Manta (!!!).\nAlternatively can use Patience II here, Powerful Hookset for !!!.",
+                postSpectral: "Krill, Mooch Ghoul Barracuda (!!) into Gladius (!!). Plump Worm under Fisher’s Intuition for Little Leviathan (!!!)",
+                bait: [krill,plumpWorm],
+                dayBait: [krill],
+                eveBait: [ragWorm],
+                nightBait: [ragWorm,shrimpCageFeeder],
             },
             {
                 name: "Northern Merlthor",
@@ -90,7 +158,11 @@
                 spectralDay: "Plump Worm, 3 Gugrusaurus (!!!). Heavy Steel Jig to catch Elasmosaurus under intuition (!!!)",
                 spectralEvening: "Ragworm, Double Hook slow ! (>5 secs).",
                 spectralNight: "Krill Double Hook !! >5 secs.",
-                postSpectral: "Ragworm, mooch Tossed Dagger (!) into Elder Dinicthys (!!) -> intuition for Shooting Star (!!!)"
+                postSpectral: "Ragworm, mooch Tossed Dagger (!) into Elder Dinicthys (!!) -> intuition for Shooting Star (!!!)",
+                bait: [krill,ragWorm],
+                dayBait: [plumpWorm,heavySteelJig],
+                eveBait: [ragWorm],
+                nightBait: [krill],
             },
             {
                 name: "Rhotano Sea",
@@ -99,7 +171,11 @@
                 spectralDay: "Plump Worm, Double Hook !!!",
                 spectralEvening: "Ragworm for Silencer (!), Rat Tail for Deep Sea Eel (!!). Catch both for intuition, then Rat Tail for Stonescale (!!!).",
                 spectralNight: "Krill, Double Hook slow ! (>5 secs)",
-                postSpectral: "Plump Worm. 2x Crimson Monkfish (!!). Krill when intuition up for Sabaton (!!!)"
+                postSpectral: "Plump Worm. 2x Crimson Monkfish (!!). Krill when intuition up for Sabaton (!!!)",
+                bait: [plumpWorm],
+                dayBait: [plumpWorm],
+                eveBait: [ragWorm,ratTail],
+                nightBait: [krill],
             },
             {
                 name: "The Cieldalaes",
@@ -108,7 +184,11 @@
                 spectralDay: "Krill, Double Hook slow !!. Alternatively can use Patience II here.",
                 spectralEvening: "Plump Worm, Double Hook slow !!. Alternatively can use Patience II here.",
                 spectralNight: "Plump Worm for 2x Jetborne Manta (fast !!!), Squid Strip for 1x Mistbeards's Cup (!!). Squid Strip for Hafgufa under intuition (!!!).",
-                postSpectral: "Ragworm 3x Metallic Boxfish (!) -> intuition, Krill for Cieldalaes Geode (!!!)"
+                postSpectral: "Ragworm 3x Metallic Boxfish (!) -> intuition, Krill for Cieldalaes Geode (!!!)",
+                bait: [ragWorm,krill],
+                dayBait: [krill],
+                eveBait: [plumpWorm],
+                nightBait: [plumpWorm,squidStrip],
             },
             {
                 name: "Bloodbrine Sea",
@@ -117,16 +197,24 @@
                 spectralDay: "Ragworm, Double Hook slowish !. Alternatively, for the blue fish, Pill Bug for 3x Beatific Vision (!!), can DH 4. Pill Bug to catch Seafaring Toad (!!!) under intuition.",
                 spectralEvening: "Plump Worm, Double Hook slow !!!. Alternatively can use Patience II here.",
                 spectralNight: "Krill, Double Hook slow !!, or at higher risk/higher reward treat as evening.",
-                postSpectral: "Ragworm, 1x Sunken Mask (!!!) -> intuition, Krill for Bareface (!!!)"
+                postSpectral: "Ragworm, 1x Sunken Mask (!!!) -> intuition, Krill for Bareface (!!!)",
+                bait: [krill,ragWorm],
+                dayBait: [ragWorm,pillBug],
+                eveBait: [plumpWorm],
+                nightBait: [krill],
             },
             {
                 name: "Rothlyt Sound",
                 value: RothlytSound,
-                base: "Surface Slap Thavnairian Shark (!!!), then only hook !!!. Alternatively can slap Lansquenet (!!) or Crow Puffer (!) if Thunderstorms.",
+                base: "Plump Worm for spectral. Surface Slap Thavnairian Shark (!!!), then only hook !!!. Alternatively can slap Lansquenet (!!) or Crow Puffer (!) if Thunderstorms.",
                 spectralDay: "Krill, Double Hook slow !!.",
-                spectralEvening: "Ragworm, mooch Rothlyt Mussel (!) into Trollfish (!). Mooch Rothlyt Mussel into Placodus (!!!) under intuition. Can use Patience II. \nAlternatively can use Krill, for a lower chance of a placodus but a chance at catching another high point fish (slow !!).",
+                spectralEvening: "Ragworm, mooch Rothlyt Mussel (!) into Trollfish (!). Mooch Rothlyt Mussel into Placodus (!!!) under intuition. Can use Patience II.\nAlternatively can use Krill, for a lower chance of a placodus but a chance at catching another high point fish (slow !!).",
                 spectralNight: "Krill, Double Hook slow !!.",
-                postSpectral: "Ragworm, 3x Rothlyt Kelp -> intuition for Ginkgo Fin (!!!)"
+                postSpectral: "Ragworm, 3x Rothlyt Kelp -> intuition for Ginkgo Fin (!!!)",
+                bait: [plumpWorm,ragWorm],
+                dayBait: [krill],
+                eveBait: [ragWorm,krill],
+                nightBait: [krill],
             }
 
         ]
@@ -144,12 +232,25 @@
                 name: "Night ",
                 value: night,
             }
-
-
         ]
 
+        function resetBait() {
+            // krill = false;
+            // ragWorm = false;
+            // plumpWorm = false;
+            // glowWorm = false;
+            // shrimpCage = false;
+            // ratTail = false;
+            // squidStrip = false;
 
+            for (var bait of baitList) {
+                bait.value = false;
+            }
+        }
 
+        function bringBait(i){
+            baitList[i].value = true;
+        }
 
         window.addEventListener('load', onDocLoaded, false);
         function onDocLoaded() {
@@ -163,9 +264,11 @@
         }
 
         function loadData() {
+            resetBait()
             loadDataForStop(firstLocation, firstTime, "FirstZone");
             loadDataForStop(secondLocation, secondTime, "SecondZone");
             loadDataForStop(thirdLocation, thirdTime, "ThirdZone");
+            loadBait();
         }
 
         function loadDataForStop(loc, time, container) {
@@ -173,20 +276,34 @@
             const para = document.createElement("p");
             var element = document.getElementById(container);
             element.innerHTML = "";
+
+
             if (time) {
                 var loc = locations[loc];
-
+                var specBait = [];
                 var locSpec;
+
                 switch (parseInt(time)) {
                     case day:
                         locSpec = loc.spectralDay;
+                        specBait = loc.dayBait;
                         break;
                     case evening:
                         locSpec = loc.spectralEvening;
+                        specBait = loc.eveBait;
                         break;
                     case night:
                         locSpec = loc.spectralNight;
+                        specBait = loc.nightBait;
                         break;
+                }
+
+                for (i = 0; i < loc.bait.length; i++) {
+                    bringBait(loc.bait[i]);
+                }
+
+                for (i = 0; i < specBait.length; i++) {
+                    bringBait(specBait[i]);
                 }
 
 
@@ -216,6 +333,21 @@
             }
 
             element.appendChild(para);
+        }
+
+        function loadBait(){
+            var element = document.getElementById("BaitZone");
+            element.innerHTML = "";
+
+            for (var bait of baitList) {
+                if (bait.value){
+                    var img = document.createElement('img'); 
+                    img.src = bait.image
+                    img.alt = bait.text
+                    img.title = bait.text
+                    element.appendChild(img);
+                }
+            }
         }
 
         function buildTextNode(text) {
@@ -347,11 +479,9 @@
 
 <body>
     <div class="container" id=''>
-        <p><strong>Original information by by: Taishelo#3790</strong></p>
-        
+        <p><strong>Original information by by: Taishelo#3790
+                Coding by Gail Larkspur</strong></p>
     </div>
-
-
 
     <div class="container">
         <div class="" id='FirstZoneDropDown'>
@@ -386,9 +516,9 @@
 
     </div>
 
-    <div class="container" id=''>
-        <p><strong>Coding by Gail Larkspur</strong></p>
-        
+    <div class="container" id='BaitZone'>
+
+
     </div>
 </body>
 
