@@ -10,6 +10,7 @@
 
         p {
             vertical-align: middle;
+            white-space: pre;
         }
 
         label {
@@ -27,6 +28,13 @@
         .container {
             display: flex;
             justify-content: center;
+            margin: 15px
+        }
+
+        .textSection {
+            border: 3px solid lightgray;
+            min-width: 500 px;
+            min-height: 150px;
         }
     </style>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -116,7 +124,7 @@
                 value: RothlytSound,
                 base: "Surface Slap Thavnairian Shark (!!!), then only hook !!!. Alternatively can slap Lansquenet (!!) or Crow Puffer (!) if Thunderstorms.",
                 spectralDay: "Krill, Double Hook slow !!.",
-                spectralEvening: "Ragworm, mooch Rothlyt Mussel (!) into Trollfish (!). Mooch Rothlyt Mussel into Placodus (!!!) under intuition. Can use Patience II. Alternatively can use Krill, for a lower chance of a placodus but a chance at catching another high point fish (slow !!).",
+                spectralEvening: "Ragworm, mooch Rothlyt Mussel (!) into Trollfish (!). Mooch Rothlyt Mussel into Placodus (!!!) under intuition. Can use Patience II. \nAlternatively can use Krill, for a lower chance of a placodus but a chance at catching another high point fish (slow !!).",
                 spectralNight: "Krill, Double Hook slow !!.",
                 postSpectral: "Ragworm, 3x Rothlyt Kelp -> intuition for Ginkgo Fin (!!!)"
             }
@@ -168,8 +176,6 @@
             if (time) {
                 var loc = locations[loc];
 
-                var locBase = loc.base;
-                var locPost = loc.postSpectral;
                 var locSpec;
                 switch (parseInt(time)) {
                     case day:
@@ -184,21 +190,23 @@
                 }
 
 
+                para.appendChild(buildBoldNode("Start"));
+
+                para.appendChild(buildBreakNode());
+                para.appendChild(buildTextNode(loc.base));
+                para.appendChild(buildBreakNode());
 
 
-                para.appendChild(buildTextNode("Start"));
-                para.appendChild(buildBreakNode());
-                para.appendChild(buildTextNode(locBase));
-                para.appendChild(buildBreakNode());
-                para.appendChild(buildTextNode("If Spectral"));
+                para.appendChild(buildBoldNode("If Spectral"));
 
                 para.appendChild(buildBreakNode());
                 para.appendChild(buildTextNode(locSpec));
                 para.appendChild(buildBreakNode());
-                para.appendChild(buildTextNode("After Spectral"));
+
+                para.appendChild(buildBoldNode("After Spectral"));
 
                 para.appendChild(buildBreakNode());
-                para.appendChild(buildTextNode(locPost));
+                para.appendChild(buildTextNode(loc.postSpectral));
                 para.appendChild(buildBreakNode());
 
 
@@ -207,12 +215,18 @@
                 para.appendChild(buildTextNode("Please Select Time and Location"));
             }
 
-
             element.appendChild(para);
         }
 
         function buildTextNode(text) {
             return document.createTextNode(text);
+        }
+
+        function buildBoldNode(text) {
+            var text = document.createTextNode(text);
+            var bold = bold = document.createElement('strong');
+            bold.appendChild(text);
+            return bold;
         }
 
         function buildBreakNode() {
@@ -332,36 +346,50 @@
 </head>
 
 <body>
-    <div class="container" id='FirstZoneDropDown'>
-
-    </div>
-    <div class="container" id='FirstZoneRadio'>
-
-    </div>
-    <div class="container" id='FirstZone'>
-
+    <div class="container" id=''>
+        <p><strong>Original information by by: Taishelo#3790</strong></p>
+        
     </div>
 
-    <div class="container" id='SecondZoneDropDown'>
+
+
+    <div class="container">
+        <div class="" id='FirstZoneDropDown'>
+
+        </div>
+        <div class="" id='FirstZoneRadio'>
+        </div>
+    </div>
+    <div class="container textSection" id='FirstZone'>
 
     </div>
-    <div class="container" id='SecondZoneRadio'>
+    <div class="container">
+        <div class="" id='SecondZoneDropDown'>
+
+        </div>
+        <div class="" id='SecondZoneRadio'>
+
+        </div>
+    </div>
+    <div class="container textSection" id='SecondZone'>
 
     </div>
-    <div class="container" id='SecondZone'>
+    <div class="container">
+        <div class="" id='ThirdZoneDropDown'>
+
+        </div>
+        <div class="" id='ThirdZoneRadio'>
+
+        </div>
+    </div>
+    <div class="container textSection" id='ThirdZone'>
 
     </div>
 
-    <div class="container" id='ThirdZoneDropDown'>
-
+    <div class="container" id=''>
+        <p><strong>Coding by Gail Larkspur</strong></p>
+        
     </div>
-    <div class="container" id='ThirdZoneRadio'>
-
-    </div>
-    <div class="container" id='ThirdZone'>
-
-    </div>
-
 </body>
 
 </html>
