@@ -29,13 +29,19 @@
         .container {
             display: flex;
             justify-content: center;
-            margin: 15px
+            margin: 5px
         }
 
         .textSection {
             border: 3px solid lightgray;
             min-width: 500 px;
             min-height: 200px;
+        }
+
+        .baitImage {
+            max-height: 100px;
+            max-width: 100px;
+            margin: 10px;
         }
     </style>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -193,8 +199,8 @@
             {
                 name: "Bloodbrine Sea",
                 value: BloodbrineSea,
-                base: "Krill for spectral. Surface Slap True Scad (!!) then only hook !!!. Alternative can slap Sunken Mask (!!!) but it's a rare hook with Krill.",
-                spectralDay: "Ragworm, Double Hook slowish !. Alternatively, for the blue fish, Pill Bug for 3x Beatific Vision (!!), can DH 4. Pill Bug to catch Seafaring Toad (!!!) under intuition.",
+                base: "Krill for spectral. Surface Slap True Scad (!!) then only hook !!!. \nAlternative can slap Sunken Mask (!!!) but it's a rare hook with Krill.",
+                spectralDay: "Ragworm, Double Hook slowish !. \nAlternatively, for the blue fish, Pill Bug for 3x Beatific Vision (!!), can DH 4. Pill Bug to catch Seafaring Toad (!!!) under intuition.",
                 spectralEvening: "Plump Worm, Double Hook slow !!!. Alternatively can use Patience II here.",
                 spectralNight: "Krill, Double Hook slow !!, or at higher risk/higher reward treat as evening.",
                 postSpectral: "Ragworm, 1x Sunken Mask (!!!) -> intuition, Krill for Bareface (!!!)",
@@ -329,7 +335,7 @@
 
 
             } else {
-                para.appendChild(buildTextNode("Please Select Time and Location"));
+                para.appendChild(buildBoldNode("Please Select Time and Location"));
             }
 
             element.appendChild(para);
@@ -342,9 +348,10 @@
             for (var bait of baitList) {
                 if (bait.value){
                     var img = document.createElement('img'); 
-                    img.src = bait.image
-                    img.alt = bait.text
-                    img.title = bait.text
+                    img.src = bait.image;
+                    img.alt = bait.text;
+                    img.title = bait.text;
+                    img.classList.add("baitImage");
                     element.appendChild(img);
                 }
             }
@@ -408,7 +415,7 @@
 
 
             var label = document.createElement("label");
-            label.innerHTML = "Please Select " + stringToAppend[0].toUpperCase() + stringToAppend.substring(1) + " Zone: "
+            label.innerHTML = stringToAppend[0].toUpperCase() + stringToAppend.substring(1) + " Zone: "
             label.htmlFor = stringToAppend + "Select";
 
             document.getElementById(container).appendChild(label).appendChild(select);
@@ -478,9 +485,8 @@
 </head>
 
 <body>
-    <div class="container" id=''>
-        <p><strong>Original information by by: Taishelo#3790
-                Coding by Gail Larkspur</strong></p>
+    <div>
+        <p><strong>Information by by: Taishelo#3790 Coding by Gail Larkspur</strong></p>
     </div>
 
     <div class="container">
