@@ -285,27 +285,27 @@
 
 
             if (time) {
-                var loc = locations[loc];
+                var locaction = locations[loc];
                 var specBait = [];
                 var locSpec;
 
                 switch (parseInt(time)) {
                     case day:
-                        locSpec = loc.spectralDay;
-                        specBait = loc.dayBait;
+                        locSpec = locaction.spectralDay;
+                        specBait = locaction.dayBait;
                         break;
                     case evening:
-                        locSpec = loc.spectralEvening;
-                        specBait = loc.eveBait;
+                        locSpec = locaction.spectralEvening;
+                        specBait = locaction.eveBait;
                         break;
                     case night:
-                        locSpec = loc.spectralNight;
-                        specBait = loc.nightBait;
+                        locSpec = locaction.spectralNight;
+                        specBait = locaction.nightBait;
                         break;
                 }
 
-                for (i = 0; i < loc.bait.length; i++) {
-                    bringBait(loc.bait[i]);
+                for (i = 0; i < locaction.bait.length; i++) {
+                    bringBait(locaction.bait[i]);
                 }
 
                 for (i = 0; i < specBait.length; i++) {
@@ -316,7 +316,7 @@
                 para.appendChild(buildBoldNode("Start"));
 
                 para.appendChild(buildBreakNode());
-                para.appendChild(buildTextNode(loc.base));
+                para.appendChild(buildTextNode(locaction.base));
                 para.appendChild(buildBreakNode());
 
 
@@ -329,7 +329,7 @@
                 para.appendChild(buildBoldNode("After Spectral"));
 
                 para.appendChild(buildBreakNode());
-                para.appendChild(buildTextNode(loc.postSpectral));
+                para.appendChild(buildTextNode(locaction.postSpectral));
                 para.appendChild(buildBreakNode());
 
 
